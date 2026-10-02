@@ -73,7 +73,7 @@ export default function App() {
   // 학년 및 학급 상태
   const [grade, setGrade] = useState<number>(userSettings.grade || 1);
   const [classNum, setClassNum] = useState<number>(userSettings.classNum || 4);
-  const [apiKey, setApiKey] = useState<string>(userSettings.apiKey || '');
+  const [apiKey, setApiKey] = useState<string>(() => userSettings.apiKey || (import.meta.env.VITE_NEIS_API_KEY as string) || '');
 
   // 시간표 주간 기준 월요일 날짜
   const [currentMonday, setCurrentMonday] = useState<Date>(() => getMondayOfWeek(new Date()));

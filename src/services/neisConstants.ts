@@ -109,6 +109,15 @@ export const DEPARTMENT_COLORS: Record<string, { bg: string; text: string; borde
   },
 };
 
+// 요일별 정규 일과 교시 수 (대진전자통신고 실제 일과: 월·수 7교시 / 화·목·금 6교시)
+export const STANDARD_DAILY_PERIOD_COUNT: Record<number, number> = {
+  1: 7, // 월요일: 7교시
+  2: 6, // 화요일: 6교시 (7교시 일과 종료)
+  3: 7, // 수요일: 7교시
+  4: 6, // 목요일: 6교시 (7교시 일과 종료)
+  5: 6, // 금요일: 6교시 (7교시 일과 종료)
+};
+
 // 교과 유형별 스타일링 (시간표 셀 색상 구분)
 export function getSubjectTheme(subject: string) {
   if (!subject) return { bg: 'bg-slate-50', text: 'text-slate-500', tag: 'bg-slate-100 text-slate-600', category: '공강/미배정' };
@@ -142,10 +151,22 @@ export function getSubjectTheme(subject: string) {
 
 // 6, 7교시 보조 보정 (특성화고 공통 연강 또는 창체/실습 규칙)
 export function getFallbackPeriodSubject(dayOfWeek: number, period: number, dept: string, p5Subject?: string): string {
-  // 금요일 5, 6, 7교시는 보통 동아리/창의적체험활동/자치활동
-  if (dayOfWeek === 5) {
-    if (period === 6) return '동아리활동';
-    if (period === 7) return '자율·자치활동';
+  // 7교시는 월(1), 수(3)에만 운영. 화(2), 목(4), 금(5)은 6교시 후 일과 종료 (7교시 수업 없음)
+  if ((dayOfWeek === 2 || dayOfWeek === 4 || dayOfWeek === 5) && period === 7) {
+    return '';
+  }
+
+  // 수요일 6, 7교시: 창체 (진로/자율활동 등)
+  if (dayOfWeek === 3 && period === 6) {
+    return '진로활동';
+  }
+  if (dayOfWeek === 3 && period === 7) {
+    return '자율·자치활동';
+  }
+
+  // 금요일 6교시: 동아리활동
+  if (dayOfWeek === 5 && period === 6) {
+    return '동아리활동';
   }
   
   // 5교시가 실습(2연강)인 경우 6교시도 같은 실습인 경우가 많음
@@ -153,7 +174,7 @@ export function getFallbackPeriodSubject(dayOfWeek: number, period: number, dept
     return p5Subject;
   }
 
-  // 학과별 특화 기본 전공 실습 또는 진로/방과후
+  // 월(1), 수(3) 7교시 및 화(2), 목(4) 6교시 학과별 전공 실습 또는 진로
   switch (dept) {
     case 'AI소프트웨어과':
       return period === 6 ? '인공지능 프로젝트 실습' : '전공 심화 탐구';

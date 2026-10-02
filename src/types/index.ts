@@ -31,6 +31,7 @@ export interface TimetableCell {
   department: string;         // 학과명
   timeRange: string;          // 예: "09:00 - 09:50"
   isCustom?: boolean;         // 사용자 직접 수정 여부
+  isNoClass?: boolean;        // 6교시 단축일 등 정규 수업 없는 교시 여부
 }
 
 export type HomeworkPriority = 'low' | 'medium' | 'high';

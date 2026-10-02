@@ -265,11 +265,30 @@ export const TimetableGrid: React.FC<TimetableGridProps> = ({
 
                   {weekDays.map((wd) => {
                     const cell = getCell(wd.dayIndex, period);
-                    const subject = cell?.subject || '수업 없음';
+                    const isNoClass = cell?.isNoClass || !cell?.subject || cell.subject === '수업 없음';
+                    const subject = cell?.subject || '';
                     const theme = getSubjectTheme(subject);
                     const cellHws = cell ? getCellHomeworks(cell) : [];
                     const pendingHws = cellHws.filter((h) => !h.isCompleted);
                     const completedHws = cellHws.filter((h) => h.isCompleted);
+
+                    if (isNoClass) {
+                      return (
+                        <td
+                          key={wd.dayIndex}
+                          className={`p-2.5 border-r border-slate-200 dark:border-slate-800 last:border-r-0 align-top transition-all duration-150 ${
+                            wd.isToday ? 'bg-blue-50/10 dark:bg-blue-950/10' : ''
+                          }`}
+                        >
+                          <div className="h-full min-h-[78px] rounded-lg p-2.5 border border-dashed border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30 flex flex-col items-center justify-center text-center text-slate-400 dark:text-slate-500">
+                            <span className="text-xs font-semibold">수업 없음</span>
+                            <span className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">
+                              {period === 7 ? '6교시 일과 종료' : '공강'}
+                            </span>
+                          </div>
+                        </td>
+                      );
+                    }
 
                     return (
                       <td

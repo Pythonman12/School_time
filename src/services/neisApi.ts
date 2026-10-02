@@ -199,6 +199,7 @@ export async function fetchWeeklyTimetable(
 
         // 3. 샘플 키 제한 등으로 6, 7교시가 비어있을 때 특성화고 정규 실습/창체 보정 적용
         const fallbackSubject = getFallbackPeriodSubject(wd.dayIndex, p, dept, p5Subject);
+        const isNoClass = !fallbackSubject;
         cells.push({
           period: p,
           dateStr: wd.ymd,
@@ -209,6 +210,7 @@ export async function fetchWeeklyTimetable(
           department: dept,
           timeRange,
           isCustom: false,
+          isNoClass,
         });
       }
     }
@@ -231,15 +233,17 @@ export async function fetchWeeklyTimetable(
     for (const wd of weekDates) {
       for (let p = 1; p <= 7; p++) {
         const periodConfig = PERIOD_SCHEDULE.find((ps) => ps.period === p);
+        const sub = getFallbackPeriodSubject(wd.dayIndex, p, dept);
         fallbackCells.push({
           period: p,
           dateStr: wd.ymd,
           formattedDate: toHyphenYMD(wd.date),
           dayOfWeek: wd.dayIndex,
           dayName: wd.dayName,
-          subject: getFallbackPeriodSubject(wd.dayIndex, p, dept),
+          subject: sub,
           department: dept,
           timeRange: periodConfig ? `${periodConfig.start} - ${periodConfig.end}` : '',
+          isNoClass: !sub,
         });
       }
     }

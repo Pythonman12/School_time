@@ -217,7 +217,14 @@ export function getCachedTimetable(cacheKey: string): TimetableCell[] | null {
     const raw = localStorage.getItem(TIMETABLE_CACHE_KEY_PREFIX + cacheKey);
     if (!raw) return null;
     const parsed = JSON.parse(raw);
-    return parsed.cells || null;
+    const cells: TimetableCell[] = parsed.cells || [];
+    // 화(2), 목(4), 금(5) 7교시는 정규 수업이 없으므로 캐시 보정
+    return cells.map((cell) => {
+      if ((cell.dayOfWeek === 2 || cell.dayOfWeek === 4 || cell.dayOfWeek === 5) && cell.period === 7 && !cell.isCustom) {
+        return { ...cell, subject: '', isNoClass: true };
+      }
+      return cell;
+    });
   } catch {
     return null;
   }

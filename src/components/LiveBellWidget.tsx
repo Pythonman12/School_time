@@ -55,6 +55,9 @@ export const LiveBellWidget: React.FC<LiveBellWidgetProps> = ({ todayCells }) =>
 
   const dayOfWeek = now.getDay();
   const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+  // 대진전자통신고 실제 일과: 월·수 7교시, 화·목·금 6교시 후 일과 종료
+  const isSixPeriodDay = dayOfWeek === 2 || dayOfWeek === 4 || dayOfWeek === 5;
+  const dayEndMinutes = isSixPeriodDay ? 15 * 60 + 30 : 16 * 60 + 30;
 
   // 현재 시간 기반 교시 및 남은 시간 계산
   const currentMinutes = now.getHours() * 60 + now.getMinutes();
@@ -74,13 +77,15 @@ export const LiveBellWidget: React.FC<LiveBellWidgetProps> = ({ todayCells }) =>
     subText = `1교시 시작(09:00)까지 ${diffMin}분 남았습니다.`;
     const p1 = todayCells.find((c) => c.period === 1);
     if (p1) highlightSubject = `1교시: ${p1.subject}`;
-  } else if (currentMinutes > 16 * 60 + 30) {
+  } else if (currentMinutes >= dayEndMinutes) {
     statusText = '방과 후 / 하교 시간';
-    subText = '오늘의 모든 정규 수업(7교시)이 종료되었습니다. 수고하셨습니다!';
+    subText = `오늘의 모든 정규 수업(${isSixPeriodDay ? '6' : '7'}교시)이 종료되었습니다. 즐거운 방과후 보내세요!`;
   } else {
     // 일과 시간 내부
     let found = false;
     for (const schedule of PERIOD_SCHEDULE) {
+      if (isSixPeriodDay && schedule.period === 7) continue;
+
       const [sh, sm] = schedule.start.split(':').map(Number);
       const [eh, em] = schedule.end.split(':').map(Number);
       const startMin = sh * 60 + sm;

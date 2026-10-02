@@ -88,8 +88,9 @@ export const TodayTimetable: React.FC<TodayTimetableProps> = ({
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-        {[1, 2, 3, 4, 5, 6, 7].map((p) => {
+        {(dayOfWeek === 1 || dayOfWeek === 3 ? [1, 2, 3, 4, 5, 6, 7] : [1, 2, 3, 4, 5, 6]).map((p) => {
           const cell = todayCells.find((c) => c.period === p);
+          if (cell?.isNoClass) return null;
           const config = PERIOD_SCHEDULE.find((s) => s.period === p);
           const status = getPeriodStatus(p);
           const theme = getSubjectTheme(cell?.subject || '');
